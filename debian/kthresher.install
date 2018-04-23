@@ -1,1 +1,2 @@
 kthresher.conf /etc/
+kthresher.bash_completion /usr/share/bash-completion/completions/kthresher
