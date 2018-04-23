@@ -2,23 +2,25 @@ pipeline:
   build:
     image: registry.pkgdev.rackspace.com/build-base:${DIST}
     commands:
-      #install build-deps
+      # Install build-deps
       - apt-get update
-      - echo yes | mk-build-deps --install --remove debian/control
-      #set up the upstream branch - has to be orphan so the git archive is pure.
+      - echo "yes" | mk-build-deps --install --remove debian/control
+      # Set up the upstream branch - has to be orphan so the origin does not
+      # include non-debian files.
       - git checkout --orphan upstream
       - git reset --hard
-      #set up the upstream branch - has to be orphan so the git archive is pure.
+      # Add the upstream branch and get the archive
       - git remote add upstream https://github.com/rackerlabs/kthresher.git
       - git fetch -t upstream
       - git archive ${VERSION} -o ../kthresher_${VERSION}.orig.tar.gz
       - tar -zxf ../kthresher_${VERSION}.orig.tar.gz
+      # Build, fetch origin debian dir and then build
+      - git fetch --no-tags origin
       - git checkout $DRONE_COMMIT -- debian
-      #execute the build
-      - debuild -us -uc
+      - debuild -us -uc --lintian-opts --profile debian
+      # Rename deb
       - cd ..
-      - rename "s/(.*)-(.*)\.deb/\1-${DIST}\2.deb/" *.deb
-
+      - rename "s/(.*)-(.*)\.deb/$1-${DIST}$2.deb/" *.deb
 
   upload-common:
     image: registry.pkgdev.rackspace.com/daf:dev
@@ -39,12 +41,13 @@ pipeline:
 
 matrix:
   DIST:
+    - bionic
     - xenial
     - trusty
-    - debian-jessie
-    - debian-stretch
     - debian-sid
+    - debian-stretch
+    - debian-jessie
   VERSION:
-    - 1.2.7
+    - 1.3.1
   RELEASE: 
     - 1

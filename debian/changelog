@@ -1,3 +1,10 @@
+kthresher (1.3.1-1) stable; urgency=medium
+
+  * New upstream release
+  * Adding bash completion
+
+ -- Rackspace Debian Packaging Team <deb-pkg-maint@lists.rackspace.com>  Mon, 23 Apr 2018 14:34:28 +0000
+
 kthresher (1.2.7-1) stable; urgency=medium
 
   * new upstream release
